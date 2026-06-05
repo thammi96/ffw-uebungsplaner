@@ -1,56 +1,89 @@
 <%- include('partials/header') %>
 
-<!-- Flatpickr CSS and Custom Material Theme -->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+<!-- Air Datepicker CSS -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/air-datepicker@3.5.3/air-datepicker.css">
 <style>
-  /* Material-like styling overrides for Flatpickr */
-  .flatpickr-day.selected, .flatpickr-day.startRange, .flatpickr-day.endRange, 
-  .flatpickr-day.selected.inRange, .flatpickr-day.startRange.inRange, 
-  .flatpickr-day.endRange.inRange, .flatpickr-day.selected:focus, 
-  .flatpickr-day.startRange:focus, .flatpickr-day.endRange:focus, 
-  .flatpickr-day.selected:hover, .flatpickr-day.startRange:hover, 
-  .flatpickr-day.endRange:hover, .flatpickr-day.prevMonthDay.selected, 
-  .flatpickr-day.nextMonthDay.selected {
-    background: #dc2626 !important; /* Firefighter Red */
-    border-color: #dc2626 !important;
-    color: #fff !important;
-  }
-  .flatpickr-calendar {
+  /* Air Datepicker - FFW Brand Overrides (Light Mode) */
+  .air-datepicker {
+    --adp-font-family: 'Outfit', sans-serif;
+    --adp-font-size: 13px;
+    --adp-width: 280px;
+    --adp-z-index: 100;
+    --adp-padding: 8px;
+    --adp-grid-areas: 'nav' 'body' 'timepicker' 'buttons';
+    --adp-color: #0f172a;
+    --adp-color-secondary: #64748b;
+    --adp-accent-color: #dc2626;
+    --adp-color-current-date: #dc2626;
+    --adp-nav-arrow-color: #475569;
+    --adp-background-color: #ffffff;
+    --adp-background-color-hover: #f1f5f9;
+    --adp-background-color-active: #dc2626;
+    --adp-background-color-in-range: rgba(220, 38, 38, 0.12);
+    --adp-background-color-in-range-focused: rgba(220, 38, 38, 0.2);
+    --adp-color-disabled: #cbd5e1;
+    --adp-color-disabled-in-range: rgba(220, 38, 38, 0.35);
+    --adp-color-other-month: #94a3b8;
+    --adp-border-color: rgba(15, 23, 42, 0.1);
+    --adp-border-color-inner: rgba(15, 23, 42, 0.06);
+    --adp-nav-border-bottom: 1px solid rgba(15, 23, 42, 0.06);
+    --adp-nav-title-color: #0f172a;
+    --adp-day-name-color: #64748b;
+    --adp-day-cell-height: 34px;
+    --adp-day-cell-width: 34px;
+    --adp-month-cell-height: 48px;
+    --adp-year-cell-height: 44px;
+    --adp-pointer-size: 10px;
+    --adp-cell-border-radius: 50%;
+    --adp-time-track-color: #cbd5e1;
+    --adp-time-track-color-selected: #dc2626;
+    --adp-time-thumb-size: 16px;
+    --adp-time-padding-inner: 10px;
+    --adp-button-color: #dc2626;
     border-radius: 1rem !important;
-    border: 1px solid rgba(15, 23, 42, 0.08) !important;
-    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05) !important;
-    font-family: inherit !important;
+    border: 1px solid rgba(15, 23, 42, 0.09) !important;
+    box-shadow: 0 20px 40px -8px rgba(0,0,0,0.18), 0 8px 16px -4px rgba(0,0,0,0.08) !important;
+    font-family: 'Outfit', sans-serif !important;
   }
-  .dark .flatpickr-calendar {
-    background: #090d16 !important; /* slate-955/darker */
-    border: 1px solid rgba(255, 255, 255, 0.08) !important;
-    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5) !important;
+  /* Air Datepicker - Dark Mode */
+  .dark .air-datepicker {
+    --adp-color: #f1f5f9;
+    --adp-color-secondary: #94a3b8;
+    --adp-accent-color: #ef4444;
+    --adp-color-current-date: #ef4444;
+    --adp-nav-arrow-color: #94a3b8;
+    --adp-background-color: #0f172a;
+    --adp-background-color-hover: #1e293b;
+    --adp-background-color-active: #dc2626;
+    --adp-background-color-in-range: rgba(220, 38, 38, 0.2);
+    --adp-background-color-in-range-focused: rgba(220, 38, 38, 0.3);
+    --adp-color-disabled: #334155;
+    --adp-color-other-month: #475569;
+    --adp-border-color: rgba(255, 255, 255, 0.08);
+    --adp-border-color-inner: rgba(255, 255, 255, 0.05);
+    --adp-nav-border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    --adp-nav-title-color: #f1f5f9;
+    --adp-day-name-color: #64748b;
+    --adp-time-track-color: #334155;
+    --adp-time-track-color-selected: #dc2626;
+    --adp-button-color: #ef4444;
+    border: 1px solid rgba(255,255,255,0.08) !important;
+    box-shadow: 0 25px 50px -10px rgba(0,0,0,0.6), 0 10px 20px -5px rgba(0,0,0,0.3) !important;
   }
-  .dark .flatpickr-day {
-    color: #f1f5f9 !important;
+  /* Nav title hover */
+  .air-datepicker-nav--title:hover {
+    color: #dc2626 !important;
   }
-  .dark .flatpickr-day.flatpickr-disabled, .dark .flatpickr-day.flatpickr-disabled:hover {
-    color: #334155 !important;
+  /* Timepicker label */
+  .air-datepicker-time--current-hours,
+  .air-datepicker-time--current-minutes {
+    font-family: 'Outfit', sans-serif !important;
+    font-weight: 700 !important;
   }
-  .dark .flatpickr-months .flatpickr-prev-month, .dark .flatpickr-months .flatpickr-next-month {
-    color: #94a3b8 !important;
-    fill: #94a3b8 !important;
-  }
-  .dark .flatpickr-current-month {
-    color: #f1f5f9 !important;
-  }
-  .dark .flatpickr-time {
-    border-top: 1px solid rgba(255, 255, 255, 0.08) !important;
-  }
-  .dark .flatpickr-time input {
-    color: #f1f5f9 !important;
-  }
-  .dark .flatpickr-time .flatpickr-time-separator {
-    color: #f1f5f9 !important;
-  }
-  .dark .flatpickr-day:hover, .dark .flatpickr-day:focus {
-    background: #1e293b !important;
+  /* Selected day text white */
+  .air-datepicker-cell.-selected- {
     color: #fff !important;
+    font-weight: 700 !important;
   }
 </style>
 
@@ -103,8 +136,9 @@
         
         <div>
           <label class="block text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1.5">Datum & Uhrzeit</label>
-          <input type="text" id="event_date_picker" name="event_date" required placeholder="Termin wählen..." 
-                 class="w-full px-4 py-2.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl focus:border-brand-500 focus:outline-none text-slate-900 dark:text-slate-100 font-medium text-sm transition-colors">
+          <input type="text" id="event_date_picker" placeholder="Termin wählen..." readonly
+                 class="w-full px-4 py-2.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl focus:border-brand-500 focus:outline-none text-slate-900 dark:text-slate-100 font-medium text-sm transition-colors cursor-pointer">
+          <input type="hidden" id="event_date_hidden" name="event_date" required>
         </div>
 
         <div>
@@ -447,6 +481,45 @@
           </div>
         </div>
 
+        <div class="border-t border-slate-200 dark:border-slate-800/60 pt-4">
+          <h4 class="text-sm font-bold text-slate-900 dark:text-white mb-2">Standard-Uhrzeiten pro Zielgruppe</h4>
+          <p class="text-xs text-slate-500 dark:text-slate-400 mb-4 leading-relaxed">
+            Beim Erstellen einer neuen Übung wird die Uhrzeit automatisch auf die hier hinterlegte Standard-Zeit gesetzt, sobald du eine Zielgruppe wählst.
+          </p>
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div>
+              <label class="block text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1.5">
+                <span class="inline-flex items-center gap-1.5">
+                  <span class="h-2 w-2 rounded-full bg-slate-400"></span>
+                  Alle (Jugend &amp; Aktive)
+                </span>
+              </label>
+              <input type="time" name="default_time_alle" value="<%= settings.default_time_alle || '19:00' %>"
+                     class="w-full px-4 py-2.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl focus:border-brand-500 focus:outline-none text-slate-900 dark:text-slate-100 font-medium text-sm transition-colors">
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1.5">
+                <span class="inline-flex items-center gap-1.5">
+                  <span class="h-2 w-2 rounded-full bg-blue-400"></span>
+                  Jugendfeuerwehr
+                </span>
+              </label>
+              <input type="time" name="default_time_jugend" value="<%= settings.default_time_jugend || '18:30' %>"
+                     class="w-full px-4 py-2.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl focus:border-brand-500 focus:outline-none text-slate-900 dark:text-slate-100 font-medium text-sm transition-colors">
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1.5">
+                <span class="inline-flex items-center gap-1.5">
+                  <span class="h-2 w-2 rounded-full bg-brand-500"></span>
+                  Aktive Mannschaft
+                </span>
+              </label>
+              <input type="time" name="default_time_aktive" value="<%= settings.default_time_aktive || '19:30' %>"
+                     class="w-full px-4 py-2.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl focus:border-brand-500 focus:outline-none text-slate-900 dark:text-slate-100 font-medium text-sm transition-colors">
+            </div>
+          </div>
+        </div>
+
         <div class="text-right border-t border-slate-200 dark:border-slate-800/60 pt-4">
           <button type="submit" class="px-5 py-2.5 bg-brand-600 hover:bg-brand-500 text-white font-semibold rounded-xl text-sm transition-all shadow-lg shadow-brand-600/10">
             Einstellungen speichern
@@ -500,9 +573,21 @@
     </div>
   </div>
 </div>
-<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
-<script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/de.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/air-datepicker@3.5.3/air-datepicker.js"></script>
 <script>
+  // Inline German locale for Air Datepicker (avoids CDN module issues)
+  const deLocale = {
+    days: ['Sonntag', 'Montag', 'Dienstag', 'Mittwoch', 'Donnerstag', 'Freitag', 'Samstag'],
+    daysShort: ['Son', 'Mon', 'Die', 'Mit', 'Don', 'Fre', 'Sam'],
+    daysMin: ['So', 'Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa'],
+    months: ['Januar', 'Februar', 'März', 'April', 'Mai', 'Juni', 'Juli', 'August', 'September', 'Oktober', 'November', 'Dezember'],
+    monthsShort: ['Jan', 'Feb', 'Mär', 'Apr', 'Mai', 'Jun', 'Jul', 'Aug', 'Sep', 'Okt', 'Nov', 'Dez'],
+    today: 'Heute',
+    clear: 'Löschen',
+    dateFormat: 'dd.MM.yyyy',
+    timeFormat: 'HH:mm',
+    firstDay: 1
+  };
   // Simple interactive tab switching logic (via hash routing from header links)
   const tabContentEvents = document.getElementById('tab-content-events');
   const tabContentUsers = document.getElementById('tab-content-users');
@@ -559,15 +644,100 @@
     }
   }
 
-  // Initialize Flatpickr for Date & Time picker
-  flatpickr("#event_date_picker", {
-    enableTime: true,
-    dateFormat: "Y-m-dTH:i",
-    altInput: true,
-    altFormat: "d.m.Y, H:i \\U\\h\\r",
-    locale: "de",
-    time_24hr: true
+  // Default times per group (from global settings)
+  const defaultTimes = {
+    'ALLE':   '<%= settings.default_time_alle   || "19:00" %>',
+    'JUGEND': '<%= settings.default_time_jugend || "18:30" %>',
+    'AKTIVE': '<%= settings.default_time_aktive || "19:30" %>'
+  };
+
+  // Helper to write the ISO value into the hidden field
+  function writeIsoValue(date) {
+    if (!date) return;
+    const pad = n => String(n).padStart(2, '0');
+    const iso = `${date.getFullYear()}-${pad(date.getMonth()+1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}`;
+    document.getElementById('event_date_hidden').value = iso;
+  }
+
+  // Flag to prevent infinite loop when we re-select with default time
+  let isApplyingDefault = false;
+
+  // Initialize Air Datepicker — stays open after date selection so user can pick time too
+  const airDpInstance = new AirDatepicker('#event_date_picker', {
+    locale: deLocale,
+    timepicker: true,
+    timeFormat: 'HH:mm',
+    dateFormat: 'dd.MM.yyyy',
+    isMobile: false,
+    autoClose: false,
+    toggleSelected: false,
+    minutesStep: 5,
+    buttons: [
+      {
+        content: 'Heute',
+        className: 'air-datepicker-button',
+        onClick: (dp) => { dp.selectDate(new Date()); }
+      },
+      'clear',
+      {
+        content: '&#10003; Übernehmen',
+        className: 'air-datepicker-button',
+        attrs: { style: 'background:var(--adp-accent-color);color:#fff;border-radius:8px;font-weight:700;padding:6px 14px;' },
+        onClick: (dp) => { dp.hide(); }
+      }
+    ],
+    classes: document.documentElement.classList.contains('dark') ? 'dark' : '',
+    onSelect({ date }) {
+      if (!date) {
+        document.getElementById('event_date_hidden').value = '';
+        return;
+      }
+
+      // If this is a fresh date click (time = midnight), auto-apply the group default time
+      if (!isApplyingDefault && date.getHours() === 0 && date.getMinutes() === 0) {
+        const group = document.querySelector('select[name="target_group"]').value;
+        const timeStr = defaultTimes[group] || '19:00';
+        const [dh, dm] = timeStr.split(':').map(Number);
+        const newDate = new Date(date);
+        newDate.setHours(dh, dm, 0, 0);
+        isApplyingDefault = true;
+        airDpInstance.selectDate(newDate);
+        // writeIsoValue is called in the next invocation
+        return;
+      }
+
+      isApplyingDefault = false;
+      writeIsoValue(date);
+    }
   });
+
+  // When target group changes, update the time part of an already-selected date
+  document.querySelector('select[name="target_group"]').addEventListener('change', function() {
+    const selected = airDpInstance.selectedDates[0];
+    if (!selected) return; // no date chosen yet → nothing to update
+    const timeStr = defaultTimes[this.value] || '19:00';
+    const [dh, dm] = timeStr.split(':').map(Number);
+    const updated = new Date(selected);
+    updated.setHours(dh, dm, 0, 0);
+    isApplyingDefault = true; // skip the midnight-check in onSelect
+    airDpInstance.selectDate(updated);
+    writeIsoValue(updated);
+  });
+
+  // Keep Air Datepicker in sync with dark/light mode changes
+  const themeBtn = document.getElementById('theme-toggle-btn');
+  if (themeBtn) {
+    themeBtn.addEventListener('click', () => {
+      requestAnimationFrame(() => {
+        const isDark = document.documentElement.classList.contains('dark');
+        const dp = airDpInstance.$datepicker;
+        if (dp) {
+          if (isDark) dp.classList.add('dark');
+          else dp.classList.remove('dark');
+        }
+      });
+    });
+  }
 </script>
 
 <%- include('partials/footer') %>

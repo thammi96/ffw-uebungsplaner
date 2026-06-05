@@ -309,7 +309,7 @@ router.post('/event/:id/send-reminders', async (req, res) => {
 // POST /admin/settings/save
 router.post('/settings/save', (req, res) => {
   const admin = req.session.admin;
-  const { app_name, app_subtitle, push_title_template, push_body_template, suggestions_zusage, suggestions_absage } = req.body;
+  const { app_name, app_subtitle, push_title_template, push_body_template, suggestions_zusage, suggestions_absage, default_time_alle, default_time_jugend, default_time_aktive } = req.body;
 
   if (!app_name || !app_subtitle) {
     return res.status(400).send('Name der App und Unterüberschrift sind erforderlich.');
@@ -323,6 +323,9 @@ router.post('/settings/save', (req, res) => {
     stmt.run('push_body_template', push_body_template || 'Nächste Übung am {date}. Bitte gib Rückmeldung.');
     stmt.run('suggestions_zusage', suggestions_zusage || '');
     stmt.run('suggestions_absage', suggestions_absage || '');
+    stmt.run('default_time_alle', default_time_alle || '19:00');
+    stmt.run('default_time_jugend', default_time_jugend || '18:30');
+    stmt.run('default_time_aktive', default_time_aktive || '19:30');
 
     logAudit(
       null,
