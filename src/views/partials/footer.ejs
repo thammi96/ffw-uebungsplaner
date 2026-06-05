@@ -4,8 +4,14 @@
   <footer class="border-t border-slate-200 dark:border-slate-900 bg-white/40 dark:bg-slate-950/80 py-6 text-center text-xs text-slate-500">
     <div class="max-w-4xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-4">
       <p>&copy; 2026 <%= appName %> - <%= appSubtitle %>. Alle Rechte vorbehalten.</p>
-      <div class="flex space-x-4">
-        <a href="/admin" class="hover:text-brand-500 transition-colors">Admin-Bereich</a>
+      <div class="flex items-center space-x-4">
+        <% if (!locals.admin) { %>
+          <a href="/admin" class="px-3 py-1.5 rounded-lg bg-brand-600 hover:bg-brand-500 text-xs font-semibold text-white transition-all shadow-md shadow-brand-600/25 hover:shadow-lg hover:shadow-brand-600/30">
+            Admin Login
+          </a>
+        <% } else { %>
+          <a href="/admin" class="hover:text-brand-500 transition-colors font-medium">Admin-Bereich</a>
+        <% } %>
       </div>
     </div>
   </footer>
