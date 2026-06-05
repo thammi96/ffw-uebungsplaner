@@ -10,20 +10,25 @@ RUN apt-get update && apt-get install -y \
 
 WORKDIR /app
 
-# Copy dependency configs and set ownership
+# Give the node user ownership of the working directory upfront
+RUN chown node:node /app
+
+# Switch to non-root user BEFORE installing dependencies
+# → npm ci runs as node, so all node_modules files are already owned by node
+#   No expensive "chown -R" pass needed afterwards!
+USER node
+
+# Copy dependency configs (already owned by node via --chown)
 COPY --chown=node:node package*.json ./
 
-# Install only production dependencies (runs under root for system build tools access, then we chown)
+# Install production dependencies as the node user
 RUN npm ci --omit=dev
 
-# Copy application sources with node ownership
+# Copy application sources
 COPY --chown=node:node . .
 
-# Ensure data folder exists and the whole app dir is owned by node user
-RUN mkdir -p /app/data && chown -R node:node /app
-
-# Switch to non-root 'node' user
-USER node
+# Create data directory (already running as node, no chown needed)
+RUN mkdir -p /app/data
 
 # Environment configuration defaults
 ENV PORT=3001
