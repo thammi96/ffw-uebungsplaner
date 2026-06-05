@@ -1,0 +1,43 @@
+version: '3.8'
+
+services:
+  ffw-uebungsplaner:
+    build: .
+    container_name: ffw-uebungsplaner
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    volumes:
+      # Persistent Volume for SQLite Database
+      - ffw-data:/app/data
+    environment:
+      - PORT=3000
+      - NODE_ENV=production
+      - DB_PATH=/app/data/database.sqlite
+      
+      # Sessions security secret (Override this in production!)
+      - SESSION_SECRET=change-this-to-a-secure-random-phrase-in-production
+      
+      # Microsoft Entra ID Config for Admin panel login
+      - ENTRA_CLIENT_ID=your-microsoft-entra-client-id
+      - ENTRA_CLIENT_SECRET=your-microsoft-entra-client-secret
+      - ENTRA_TENANT_ID=your-microsoft-entra-tenant-id
+      - ENTRA_REDIRECT_URI=https://ffw-uebungsplaner.example.com/auth/callback
+      - ENTRA_ADMIN_GROUP_ID=your-microsoft-entra-admin-group-id
+      
+      # Local Debug Login Bypass
+      # Set to 'false' in production to force Entra ID authentication!
+      - LOCAL_DEBUG_ADMIN=true
+      - LOCAL_DEBUG_ADMIN_NAME="Admin (Lokal)"
+
+      # Web Push / PWA VAPID keys
+      # Leave VAPID keys empty to let the app auto-generate and store them inside the DB settings,
+      # or specify them here to override (recommended for production multi-container scale-outs).
+      - VAPID_SUBJECT=mailto:admin@ffw-uebungsplaner.local
+      - VAPID_PUBLIC_KEY=
+      - VAPID_PRIVATE_KEY=
+
+volumes:
+  # Named volume mapped on host to ensure SQLite data persists across rebuilds/reloads
+  ffw-data:
+    driver: local

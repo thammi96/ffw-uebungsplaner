@@ -1,0 +1,400 @@
+<%- include('partials/header') %>
+
+<div class="space-y-6">
+  <!-- Top Bar with Admin Name -->
+  <div class="glass-panel rounded-2xl p-6 border border-slate-800/80 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 glow-red">
+    <div>
+      <h2 class="text-2xl font-extrabold text-white tracking-tight">Admin-Kontrollzentrum</h2>
+      <p class="text-xs text-slate-400 mt-1">Eingeloggt als: <span class="text-slate-200 font-semibold"><%= admin.name %></span> (<%= admin.email %>)</p>
+    </div>
+    
+    <!-- Action Button (Fast creation modal trigger) -->
+    <a href="#create-event-anchor" class="px-4 py-2.5 bg-brand-600 hover:bg-brand-500 text-white font-semibold rounded-xl text-sm transition-all shadow-lg shadow-brand-600/15">
+      + Neue Übung anlegen
+    </a>
+  </div>
+
+  <!-- Tab Navigation -->
+  <div class="flex border-b border-slate-900 gap-1 bg-slate-950 p-1 rounded-xl">
+    <button id="tab-btn-events" class="flex-1 py-3 text-center text-sm font-bold rounded-lg bg-slate-900 text-brand-400 transition-all">
+      Übungen & Rückmeldungen
+    </button>
+    <button id="tab-btn-users" class="flex-1 py-3 text-center text-sm font-bold rounded-lg text-slate-400 hover:text-slate-200 transition-all">
+      Mitglieder (<%= pendingUsers.length + approvedUsers.length %>)
+    </button>
+    <button id="tab-btn-audit" class="flex-1 py-3 text-center text-sm font-bold rounded-lg text-slate-400 hover:text-slate-200 transition-all">
+      Audit-Logs
+    </button>
+  </div>
+
+  <!-- TAB CONTENT 1: Events -->
+  <div id="tab-content-events" class="space-y-6">
+    <!-- Pending Approvals Alert if any -->
+    <% if (pendingUsers.length > 0) { %>
+      <div class="p-4 bg-yellow-950/40 border border-yellow-800/40 text-yellow-300 rounded-2xl flex items-center justify-between shadow-lg">
+        <div class="flex items-center space-x-3">
+          <div class="h-9 w-9 rounded-xl bg-yellow-900/40 flex items-center justify-center text-yellow-400">
+            <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+            </svg>
+          </div>
+          <div>
+            <h4 class="font-bold text-sm">Ausstehende Freigaben</h4>
+            <p class="text-xs text-yellow-400/80">Es gibt <%= pendingUsers.length %> neue Mitglieder, die freigegeben werden müssen.</p>
+          </div>
+        </div>
+        <button onclick="switchTab('users')" class="px-3.5 py-1.5 bg-yellow-800 hover:bg-yellow-700 text-yellow-100 font-semibold text-xs rounded-lg transition-colors">
+          Freigeben
+        </button>
+      </div>
+    <% } %>
+
+    <!-- Create Event Form -->
+    <div id="create-event-anchor" class="glass-panel rounded-2xl p-6 border border-slate-800/80">
+      <h3 class="text-lg font-bold text-white mb-4">Neue Übung/Termin erstellen</h3>
+      <form action="/admin/event/new" method="POST" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <label class="block text-xs font-semibold text-slate-400 mb-1.5">Titel der Übung</label>
+          <input type="text" name="title" required placeholder="z. B. Atemschutzübung / Dienstabend" 
+                 class="w-full px-4 py-2.5 bg-slate-900 border border-slate-800 rounded-xl focus:border-brand-500 focus:outline-none text-slate-100 placeholder-slate-600 font-medium text-sm transition-colors">
+        </div>
+        
+        <div>
+          <label class="block text-xs font-semibold text-slate-400 mb-1.5">Datum & Uhrzeit</label>
+          <input type="datetime-local" name="event_date" required 
+                 class="w-full px-4 py-2.5 bg-slate-900 border border-slate-800 rounded-xl focus:border-brand-500 focus:outline-none text-slate-100 font-medium text-sm transition-colors">
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold text-slate-400 mb-1.5">Zielgruppe (Mannschaft)</label>
+          <select name="target_group" class="w-full px-4 py-2.5 bg-slate-900 border border-slate-800 rounded-xl focus:border-brand-500 focus:outline-none text-slate-100 font-medium text-sm transition-colors">
+            <option value="ALLE">Alle (Jugend & Aktive)</option>
+            <option value="JUGEND">Jugendfeuerwehr</option>
+            <option value="AKTIVE">Aktive Mannschaft</option>
+          </select>
+        </div>
+
+        <div class="grid grid-cols-2 gap-2">
+          <div>
+            <label class="block text-xs text-slate-400 mb-1.5">1. Erinnerung (Minuten vorher)</label>
+            <input type="number" name="reminder_1_minutes" value="1440" required
+                   class="w-full px-4 py-2.5 bg-slate-900 border border-slate-800 rounded-xl focus:border-brand-500 focus:outline-none text-slate-100 font-medium text-sm transition-colors">
+          </div>
+          <div>
+            <label class="block text-xs text-slate-400 mb-1.5">2. Erinnerung (Minuten vorher)</label>
+            <input type="number" name="reminder_2_minutes" value="60" required
+                   class="w-full px-4 py-2.5 bg-slate-900 border border-slate-800 rounded-xl focus:border-brand-500 focus:outline-none text-slate-100 font-medium text-sm transition-colors">
+          </div>
+        </div>
+
+        <div class="md:col-span-2">
+          <label class="block text-xs font-semibold text-slate-400 mb-1.5">Beschreibung / Mitzubringen</label>
+          <textarea name="description" rows="3" placeholder="Details zur Übung, Treffpunkt, Kleidung..."
+                    class="w-full px-4 py-2.5 bg-slate-900 border border-slate-800 rounded-xl focus:border-brand-500 focus:outline-none text-slate-100 placeholder-slate-600 font-medium text-sm transition-colors"></textarea>
+        </div>
+
+        <div class="md:col-span-2 text-right">
+          <button type="submit" class="px-6 py-2.5 bg-brand-600 hover:bg-brand-500 text-white font-semibold rounded-xl text-sm shadow-lg shadow-brand-600/15 transition-all">
+            Übung speichern & veröffentlichen
+          </button>
+        </div>
+      </form>
+    </div>
+
+    <!-- Active Events List -->
+    <div class="space-y-4">
+      <h3 class="text-lg font-bold text-white">Aktuelle Übungsplanung</h3>
+      
+      <% if (events.length === 0) { %>
+        <div class="glass-panel rounded-2xl p-8 border border-slate-800/85 text-center text-slate-500 text-sm">
+          Keine Übungen geplant. Nutze das Formular oben, um eine Übung zu erstellen.
+        </div>
+      <% } else { %>
+        <% events.forEach(event => { %>
+          <div class="glass-panel rounded-2xl border border-slate-800/80 overflow-hidden shadow-lg">
+            <!-- Event Card Summary Header -->
+            <div class="p-5 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-slate-900/30 border-b border-slate-850">
+              <div>
+                <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold bg-slate-800 text-slate-300 border border-slate-700/60 mb-2">
+                  <%= event.target_group %>
+                </span>
+                <h4 class="text-lg font-bold text-white"><%= event.title %></h4>
+                <p class="text-xs text-slate-400 font-medium mt-0.5"><%= event.formatted_date %> Uhr</p>
+              </div>
+
+              <!-- Signup Statistics pill badge -->
+              <div class="flex items-center gap-2">
+                <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold bg-green-950/60 border border-green-800/40 text-green-400">
+                  <span class="h-2 w-2 rounded-full bg-green-400"></span>
+                  <%= event.yes_count %> Zusagen
+                </span>
+                <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold bg-red-950/60 border border-red-800/40 text-red-400">
+                  <span class="h-2 w-2 rounded-full bg-red-400"></span>
+                  <%= event.no_count %> Absagen
+                </span>
+              </div>
+            </div>
+
+            <!-- Event Details Panel -->
+            <div class="p-5 space-y-4">
+              <!-- Inline description -->
+              <% if (event.description) { %>
+                <div class="text-xs text-slate-400 leading-relaxed max-w-2xl bg-slate-900/10 p-3 rounded-lg border border-slate-900">
+                  <%= event.description %>
+                </div>
+              <% } %>
+
+              <!-- Attendee List Table -->
+              <div class="overflow-x-auto">
+                <table class="w-full text-left text-xs border-collapse">
+                  <thead>
+                    <tr class="border-b border-slate-800 text-slate-500 uppercase tracking-wider font-semibold">
+                      <th class="py-2.5">Mitglied</th>
+                      <th class="py-2.5">Handy</th>
+                      <th class="py-2.5">Status</th>
+                      <th class="py-2.5">Kommentar / Rückmeldung</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <% const signups = eventSignups[event.id] || []; %>
+                    <% if (signups.length === 0) { %>
+                      <tr>
+                        <td colspan="4" class="py-4 text-center text-slate-600">Keine Rückmeldungen vorhanden.</td>
+                      </tr>
+                    <% } else { %>
+                      <% signups.forEach(signup => { %>
+                        <tr class="border-b border-slate-800/50 hover:bg-slate-900/20">
+                          <td class="py-2.5 font-bold text-slate-200"><%= signup.name %></td>
+                          <td class="py-2.5 text-slate-400 font-mono"><%= signup.phone_number %></td>
+                          <td class="py-2.5">
+                            <span class="inline-block px-2 py-0.5 rounded text-[10px] font-bold <%= signup.status === 'ZUSAGE' ? 'bg-green-950/50 border border-green-800/40 text-green-400' : 'bg-red-950/50 border border-red-800/40 text-red-400' %>">
+                              <%= signup.status %>
+                            </span>
+                          </td>
+                          <td class="py-2.5 text-slate-300 italic"><%= signup.comment || '—' %></td>
+                        </tr>
+                      <% }) %>
+                    <% } %>
+                  </tbody>
+                </table>
+              </div>
+
+              <!-- Action Buttons for Event -->
+              <div class="flex flex-wrap items-center justify-between border-t border-slate-800/60 pt-4 gap-2">
+                <!-- Push notifications trigger -->
+                <form action="/admin/event/<%= event.id %>/send-reminders" method="POST">
+                  <button type="submit" 
+                          class="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 font-semibold text-xs rounded-lg border border-slate-750 transition-colors flex items-center gap-1.5">
+                    <svg class="h-3.5 w-3.5 text-brand-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+                    </svg>
+                    Manuell Push-Erinnerung senden
+                  </button>
+                </form>
+
+                <div class="flex items-center gap-2">
+                  <a href="/event/<%= event.id %>" target="_blank" 
+                     class="px-3 py-1.5 border border-slate-700 text-slate-300 hover:text-white text-xs font-semibold rounded-lg transition-colors">
+                    Öffentlicher Link
+                  </a>
+                  
+                  <!-- Delete Event Form -->
+                  <form action="/admin/event/<%= event.id %>/delete" method="POST" onsubmit="return confirm('Soll diese Übung wirklich gelöscht werden?');">
+                    <button type="submit" 
+                            class="px-3 py-1.5 bg-red-950/40 border border-red-900/60 hover:bg-red-950/70 text-red-400 text-xs font-semibold rounded-lg transition-colors">
+                      Übung löschen
+                    </button>
+                  </form>
+                </div>
+              </div>
+            </div>
+          </div>
+        <% }) %>
+      <% } %>
+    </div>
+  </div>
+
+  <!-- TAB CONTENT 2: Users Management -->
+  <div id="tab-content-users" class="space-y-6 hidden">
+    <!-- Pending Approvals section -->
+    <div class="glass-panel rounded-2xl p-6 border border-slate-800/80">
+      <h3 class="text-lg font-bold text-white mb-4">Ausstehende Freigabe-Anfragen</h3>
+      
+      <% if (pendingUsers.length === 0) { %>
+        <p class="text-slate-500 text-sm py-2">Keine ausstehenden Registrierungsanfragen.</p>
+      <% } else { %>
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-xs border-collapse">
+            <thead>
+              <tr class="border-b border-slate-800 text-slate-500 uppercase tracking-wider font-semibold">
+                <th class="py-2.5">Name</th>
+                <th class="py-2.5">Handynummer</th>
+                <th class="py-2.5">Abteilung</th>
+                <th class="py-2.5">Datum der Anfrage</th>
+                <th class="py-2.5 text-right">Aktionen</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% pendingUsers.forEach(user => { %>
+                <tr class="border-b border-slate-800/50 hover:bg-slate-900/20">
+                  <td class="py-3 font-bold text-slate-200"><%= user.name %></td>
+                  <td class="py-3 text-slate-400 font-mono"><%= user.phone_number %></td>
+                  <td class="py-3"><%= user.group_type === 'JUGEND' ? 'Jugendfeuerwehr' : (user.group_type === 'AKTIVE' ? 'Aktive Mannschaft' : 'Beide / Ausbilder') %></td>
+                  <td class="py-3 text-slate-500"><%= new Date(user.created_at).toLocaleDateString('de-DE') %></td>
+                  <td class="py-3 text-right">
+                    <div class="flex items-center justify-end gap-2">
+                      <form action="/admin/user/<%= user.id %>/approve" method="POST">
+                        <button type="submit" 
+                                class="px-2.5 py-1 bg-green-600 hover:bg-green-500 text-white font-semibold text-xs rounded transition-colors shadow">
+                          Freigeben
+                        </button>
+                      </form>
+                      <form action="/admin/user/<%= user.id %>/delete" method="POST" onsubmit="return confirm('Registrierungsanfrage ablehnen und löschen?');">
+                        <button type="submit" 
+                                class="px-2.5 py-1 bg-red-950/40 border border-red-900/60 hover:bg-red-950/70 text-red-400 text-xs font-semibold rounded transition-colors">
+                          Ablehnen
+                        </button>
+                      </form>
+                    </div>
+                  </td>
+                </tr>
+              <% }) %>
+            </tbody>
+          </table>
+        </div>
+      <% } %>
+    </div>
+
+    <!-- Approved Users Directory -->
+    <div class="glass-panel rounded-2xl p-6 border border-slate-800/80">
+      <h3 class="text-lg font-bold text-white mb-4">Mitglieder-Verzeichnis</h3>
+      
+      <% if (approvedUsers.length === 0) { %>
+        <p class="text-slate-500 text-sm py-2">Noch keine freigegebenen Mitglieder.</p>
+      <% } else { %>
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-xs border-collapse">
+            <thead>
+              <tr class="border-b border-slate-800 text-slate-500 uppercase tracking-wider font-semibold">
+                <th class="py-2.5">Name</th>
+                <th class="py-2.5">Handynummer</th>
+                <th class="py-2.5">Abteilung</th>
+                <th class="py-2.5 text-right">Aktionen</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% approvedUsers.forEach(user => { %>
+                <tr class="border-b border-slate-800/50 hover:bg-slate-900/20">
+                  <td class="py-3 font-bold text-slate-200"><%= user.name %></td>
+                  <td class="py-3 text-slate-400 font-mono"><%= user.phone_number %></td>
+                  <td class="py-3"><%= user.group_type === 'JUGEND' ? 'Jugendfeuerwehr' : (user.group_type === 'AKTIVE' ? 'Aktive Mannschaft' : 'Beide / Ausbilder') %></td>
+                  <td class="py-3 text-right">
+                    <form action="/admin/user/<%= user.id %>/delete" method="POST" onsubmit="return confirm('Mitglied und alle dessen Rückmeldungen wirklich löschen?');">
+                      <button type="submit" 
+                              class="px-2.5 py-1 bg-red-950/40 border border-red-900/60 hover:bg-red-950/70 text-red-400 text-xs font-semibold rounded transition-colors">
+                        Löschen
+                      </button>
+                    </form>
+                  </td>
+                </tr>
+              <% }) %>
+            </tbody>
+          </table>
+        </div>
+      <% } %>
+    </div>
+  </div>
+
+  <!-- TAB CONTENT 3: Audit Logs -->
+  <div id="tab-content-audit" class="space-y-4 hidden">
+    <div class="glass-panel rounded-2xl p-6 border border-slate-800/80">
+      <h3 class="text-lg font-bold text-white mb-1">System-Protokoll (Audit logs)</h3>
+      <p class="text-xs text-slate-400 mb-4 font-medium">Lückenlose Protokollierung aller administrativen Aktivitäten und Registrierungen.</p>
+      
+      <div class="overflow-x-auto">
+        <table class="w-full text-left text-xs border-collapse">
+          <thead>
+            <tr class="border-b border-slate-800 text-slate-500 uppercase tracking-wider font-semibold">
+              <th class="py-2.5 w-1/5">Zeitstempel</th>
+              <th class="py-2.5 w-1/5">Benutzer</th>
+              <th class="py-2.5 w-1/5">Aktion</th>
+              <th class="py-2.5 w-1/3">Details</th>
+              <th class="py-2.5">IP-Adresse</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% auditLogs.forEach(log => { %>
+              <tr class="border-b border-slate-800/50 hover:bg-slate-900/20">
+                <td class="py-2.5 text-slate-400 font-mono"><%= log.formatted_date %></td>
+                <td class="py-2.5 text-slate-200 font-bold"><%= log.user_name || 'System' %></td>
+                <td class="py-2.5">
+                  <span class="inline-block px-1.5 py-0.5 rounded text-[9px] font-bold font-mono 
+                    <%= log.action.includes('SUCCESS') ? 'bg-green-950/50 text-green-400 border border-green-800/40' : 
+                       (log.action.includes('FAILURE') ? 'bg-red-950/50 text-red-400 border border-red-800/40' : 
+                       (log.action.includes('DELETE') ? 'bg-orange-950/50 text-orange-400 border border-orange-800/40' : 'bg-slate-800 text-slate-300')) %>">
+                    <%= log.action %>
+                  </span>
+                </td>
+                <td class="py-2.5 text-slate-300"><%= log.details %></td>
+                <td class="py-2.5 text-slate-500 font-mono text-[11px]"><%= log.ip_address || '—' %></td>
+              </tr>
+            <% }) %>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Simple interactive tab switching logic
+  const tabBtnEvents = document.getElementById('tab-btn-events');
+  const tabBtnUsers = document.getElementById('tab-btn-users');
+  const tabBtnAudit = document.getElementById('tab-btn-audit');
+
+  const tabContentEvents = document.getElementById('tab-content-events');
+  const tabContentUsers = document.getElementById('tab-content-users');
+  const tabContentAudit = document.getElementById('tab-content-audit');
+
+  function switchTab(tab) {
+    // Reset buttons
+    tabBtnEvents.className = 'flex-1 py-3 text-center text-sm font-bold rounded-lg text-slate-400 hover:text-slate-200 transition-all';
+    tabBtnUsers.className = 'flex-1 py-3 text-center text-sm font-bold rounded-lg text-slate-400 hover:text-slate-200 transition-all';
+    tabBtnAudit.className = 'flex-1 py-3 text-center text-sm font-bold rounded-lg text-slate-400 hover:text-slate-200 transition-all';
+
+    // Hide contents
+    tabContentEvents.classList.add('hidden');
+    tabContentUsers.classList.add('hidden');
+    tabContentAudit.classList.add('hidden');
+
+    // Activate selected
+    if (tab === 'events') {
+      tabBtnEvents.className = 'flex-1 py-3 text-center text-sm font-bold rounded-lg bg-slate-900 text-brand-400 transition-all';
+      tabContentEvents.classList.remove('hidden');
+    } else if (tab === 'users') {
+      tabBtnUsers.className = 'flex-1 py-3 text-center text-sm font-bold rounded-lg bg-slate-900 text-brand-400 transition-all';
+      tabContentUsers.classList.remove('hidden');
+    } else if (tab === 'audit') {
+      tabBtnAudit.className = 'flex-1 py-3 text-center text-sm font-bold rounded-lg bg-slate-900 text-brand-400 transition-all';
+      tabContentAudit.classList.remove('hidden');
+    }
+  }
+
+  tabBtnEvents.addEventListener('click', () => switchTab('events'));
+  tabBtnUsers.addEventListener('click', () => switchTab('users'));
+  tabBtnAudit.addEventListener('click', () => switchTab('audit'));
+
+  // Listen for hash changes to navigate directly to tabs (e.g. from registration alert)
+  window.addEventListener('hashchange', () => {
+    if (window.location.hash === '#users') {
+      switchTab('users');
+    }
+  });
+
+  // Check initial hash
+  if (window.location.hash === '#users') {
+    switchTab('users');
+  }
+</script>
+
+<%- include('partials/footer') %>
