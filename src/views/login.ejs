@@ -1,15 +1,15 @@
 <%- include('partials/header') %>
 
 <div class="flex flex-col items-center justify-center py-12 px-4">
-  <div class="w-full max-w-md glass-panel rounded-2xl overflow-hidden shadow-2xl border border-slate-800/80 p-8 glow-red">
+  <div class="w-full max-w-md glass-panel rounded-2xl overflow-hidden shadow-2xl p-8 glow-red">
     <div class="text-center mb-8">
       <div class="h-16 w-16 mx-auto mb-4 rounded-2xl bg-gradient-to-tr from-brand-700 to-brand-500 flex items-center justify-center shadow-lg shadow-brand-500/20">
         <svg class="h-9 w-9 text-white animate-pulse" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
           <path stroke-linecap="round" stroke-linejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
         </svg>
       </div>
-      <h2 class="text-2xl font-extrabold tracking-tight text-white">Admin-Bereich</h2>
-      <p class="text-slate-400 mt-2 text-sm">Bitte melde dich an, um Übungen und Mitglieder zu verwalten.</p>
+      <h2 class="text-2xl font-extrabold tracking-tight text-slate-900 dark:text-white">Admin-Bereich</h2>
+      <p class="text-slate-500 dark:text-slate-400 mt-2 text-sm">Bitte melde dich an, um Übungen und Mitglieder zu verwalten.</p>
     </div>
 
     <div class="space-y-4">
@@ -26,26 +26,26 @@
           Mit Microsoft 365 anmelden
         </a>
       <% } else if (!localDebug) { %>
-        <div class="p-4 rounded-xl bg-yellow-950/40 border border-yellow-800/40 text-yellow-300 text-sm text-center">
+        <div class="p-4 rounded-xl bg-yellow-50 dark:bg-yellow-950/40 border border-yellow-200 dark:border-yellow-800/40 text-yellow-700 dark:text-yellow-300 text-sm text-center">
           Microsoft Entra ID ist nicht konfiguriert und der lokale Debug-Modus ist deaktiviert.
         </div>
       <% } %>
 
       <% if (localDebug) { %>
         <div class="relative flex py-2 items-center">
-          <div class="flex-grow border-t border-slate-800"></div>
-          <span class="flex-shrink mx-4 text-slate-500 text-xs font-semibold uppercase tracking-wider">Entwicklung & Test</span>
-          <div class="flex-grow border-t border-slate-800"></div>
+          <div class="flex-grow border-t border-slate-200 dark:border-slate-800"></div>
+          <span class="flex-shrink mx-4 text-slate-400 dark:text-slate-500 text-[10px] font-bold uppercase tracking-wider">Entwicklung & Test</span>
+          <div class="flex-grow border-t border-slate-200 dark:border-slate-800"></div>
         </div>
 
-        <a href="/auth/debug" class="w-full flex items-center justify-center gap-2 px-4 py-3 bg-slate-800 hover:bg-slate-700 text-slate-200 font-semibold rounded-xl border border-slate-700/60 shadow-lg transition-all duration-200 transform hover:-translate-y-0.5 active:translate-y-0">
-          <svg class="h-5 w-5 text-brand-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <a href="/auth/debug" class="w-full flex items-center justify-center gap-2 px-4 py-3 bg-slate-200 hover:bg-slate-300 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 font-semibold rounded-xl border border-slate-300 dark:border-slate-700/60 shadow-lg transition-all duration-200 transform hover:-translate-y-0.5 active:translate-y-0">
+          <svg class="h-5 w-5 text-brand-500 dark:text-brand-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
             <path stroke-linecap="round" stroke-linejoin="round" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
           </svg>
           Lokaler Debug-Modus (Bypass)
         </a>
-        <p class="text-[11px] text-center text-slate-500 mt-2">
-          Dieser Bypass ist aktiv, weil <code class="text-brand-400 font-mono">LOCAL_DEBUG_ADMIN=true</code> in der Konfiguration definiert ist. In der Produktion sollte dies deaktiviert sein.
+        <p class="text-[10px] text-center text-slate-400 dark:text-slate-500 mt-2">
+          Dieser Bypass ist aktiv, weil <code class="text-brand-500 dark:text-brand-400 font-mono">LOCAL_DEBUG_ADMIN=true</code> in der Konfiguration definiert ist. In der Produktion sollte dies deaktiviert sein.
         </p>
       <% } %>
     </div>

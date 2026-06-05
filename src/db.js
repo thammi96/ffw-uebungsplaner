@@ -79,6 +79,14 @@ db.exec(`
   );
 `);
 
+// Pre-fill default settings
+db.exec(`
+  INSERT OR IGNORE INTO settings (key, value) VALUES ('app_name', 'Feuerwehr Übungsplaner');
+  INSERT OR IGNORE INTO settings (key, value) VALUES ('app_subtitle', 'Freiwillige Feuerwehr');
+  INSERT OR IGNORE INTO settings (key, value) VALUES ('push_title_template', 'Terminerinnerung: {title}');
+  INSERT OR IGNORE INTO settings (key, value) VALUES ('push_body_template', 'Nächste Übung am {date}. Bitte gib Rückmeldung.');
+`);
+
 const webpush = require('web-push');
 
 /**

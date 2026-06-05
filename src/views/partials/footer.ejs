@@ -1,14 +1,48 @@
   </main>
 
   <!-- Footer -->
-  <footer class="border-t border-slate-900 bg-slate-950/80 py-6 text-center text-xs text-slate-500">
+  <footer class="border-t border-slate-200 dark:border-slate-900 bg-white/40 dark:bg-slate-950/80 py-6 text-center text-xs text-slate-500">
     <div class="max-w-4xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-4">
-      <p>&copy; 2026 Freiwillige Feuerwehr Übungsplaner. Alle Rechte vorbehalten.</p>
+      <p>&copy; 2026 <%= appName %> - <%= appSubtitle %>. Alle Rechte vorbehalten.</p>
       <div class="flex space-x-4">
-        <a href="/admin" class="hover:text-brand-400 transition-colors">Admin-Bereich</a>
+        <a href="/admin" class="hover:text-brand-500 transition-colors">Admin-Bereich</a>
       </div>
     </div>
   </footer>
+
+  <!-- Theme Switching Logic -->
+  <script>
+    (function() {
+      const themeToggleBtn = document.getElementById('theme-toggle-btn');
+      const sunIcon = document.getElementById('theme-sun-icon');
+      const moonIcon = document.getElementById('theme-moon-icon');
+
+      if (!themeToggleBtn) return;
+
+      function updateThemeIcons() {
+        if (document.documentElement.classList.contains('dark')) {
+          sunIcon.classList.remove('hidden');
+          moonIcon.classList.add('hidden');
+        } else {
+          sunIcon.classList.add('hidden');
+          moonIcon.classList.remove('hidden');
+        }
+      }
+      
+      updateThemeIcons();
+
+      themeToggleBtn.addEventListener('click', () => {
+        if (document.documentElement.classList.contains('dark')) {
+          document.documentElement.classList.remove('dark');
+          localStorage.setItem('theme', 'light');
+        } else {
+          document.documentElement.classList.add('dark');
+          localStorage.setItem('theme', 'dark');
+        }
+        updateThemeIcons();
+      });
+    })();
+  </script>
 
   <!-- Web Push PWA script injection -->
   <script src="/app.js"></script>

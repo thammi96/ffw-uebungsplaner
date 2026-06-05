@@ -1,7 +1,11 @@
 const express = require('express');
 const { db, logAudit, webpush } = require('../db');
+const multer = require('multer');
 
 const router = express.Router();
+const upload = multer({
+  limits: { fileSize: 2 * 1024 * 1024 } // limit to 2MB
+});
 
 // Middleware to protect admin routes
 function requireAdmin(req, res, next) {
@@ -75,13 +79,19 @@ router.get('/', (req, res) => {
       eventSignups[e.id] = signups;
     }
 
+    // 6. Fetch settings
+    const settingsRows = db.prepare('SELECT * FROM settings').all();
+    const settings = {};
+    settingsRows.forEach(r => { settings[r.key] = r.value; });
+
     res.render('admin', {
       admin,
       events,
       pendingUsers,
       approvedUsers,
       auditLogs,
-      eventSignups
+      eventSignups,
+      settings
     });
   } catch (error) {
     console.error('Error loading admin dashboard:', error);
@@ -238,9 +248,19 @@ router.post('/event/:id/send-reminders', async (req, res) => {
       )
     `).all(event.target_group, event.target_group, event.target_group);
 
+    // Load push templates
+    const titleRow = db.prepare("SELECT value FROM settings WHERE key = 'push_title_template'").get();
+    const bodyRow = db.prepare("SELECT value FROM settings WHERE key = 'push_body_template'").get();
+    const titleTpl = titleRow ? titleRow.value : 'Terminerinnerung: {title}';
+    const bodyTpl = bodyRow ? bodyRow.value : 'Nächste Übung am {date}. Bitte gib Rückmeldung.';
+
+    const formattedDate = formatGermanDate(event.event_date);
+    const pushTitle = titleTpl.replace(/{title}/g, event.title).replace(/{date}/g, formattedDate);
+    const pushBody = bodyTpl.replace(/{title}/g, event.title).replace(/{date}/g, formattedDate);
+
     const payload = JSON.stringify({
-      title: `Terminerinnerung: ${event.title}`,
-      body: `Nächste Übung am ${formatGermanDate(event.event_date)}. Bitte gib Rückmeldung.`,
+      title: pushTitle,
+      body: pushBody,
       url: `/event/${event.id}`
     });
 
@@ -283,6 +303,91 @@ router.post('/event/:id/send-reminders', async (req, res) => {
   } catch (error) {
     console.error('Error triggering push notifications:', error);
     res.status(500).send('Fehler beim Senden der Push-Nachrichten.');
+  }
+});
+
+// POST /admin/settings/save
+router.post('/settings/save', (req, res) => {
+  const admin = req.session.admin;
+  const { app_name, app_subtitle, push_title_template, push_body_template } = req.body;
+
+  if (!app_name || !app_subtitle) {
+    return res.status(400).send('Name der App und Unterüberschrift sind erforderlich.');
+  }
+
+  try {
+    const stmt = db.prepare('INSERT OR REPLACE INTO settings (key, value) VALUES (?, ?)');
+    stmt.run('app_name', app_name);
+    stmt.run('app_subtitle', app_subtitle);
+    stmt.run('push_title_template', push_title_template || 'Terminerinnerung: {title}');
+    stmt.run('push_body_template', push_body_template || 'Nächste Übung am {date}. Bitte gib Rückmeldung.');
+
+    logAudit(
+      null,
+      admin.name,
+      'SETTINGS_SAVE',
+      `Globale Einstellungen aktualisiert (Titel: ${app_name})`,
+      req.ip
+    );
+
+    res.redirect('/admin#settings');
+  } catch (error) {
+    console.error('Error saving settings:', error);
+    res.status(500).send('Fehler beim Speichern der Einstellungen.');
+  }
+});
+
+// POST /admin/settings/upload-logo
+router.post('/settings/upload-logo', upload.single('logo'), (req, res) => {
+  const admin = req.session.admin;
+  
+  if (!req.file) {
+    return res.status(400).send('Keine Datei hochgeladen.');
+  }
+
+  // Ensure it's an image
+  if (!req.file.mimetype.startsWith('image/')) {
+    return res.status(400).send('Nur Bilddateien sind erlaubt.');
+  }
+
+  try {
+    const base64 = req.file.buffer.toString('base64');
+    db.prepare("INSERT OR REPLACE INTO settings (key, value) VALUES ('custom_logo_base64', ?)").run(base64);
+
+    logAudit(
+      null,
+      admin.name,
+      'SETTINGS_LOGO_UPLOAD',
+      `Neues App-Logo/Icon hochgeladen (${req.file.originalname})`,
+      req.ip
+    );
+
+    res.redirect('/admin#settings');
+  } catch (error) {
+    console.error('Error uploading logo:', error);
+    res.status(500).send('Fehler beim Hochladen des Logos.');
+  }
+});
+
+// POST /admin/settings/reset-logo
+router.post('/settings/reset-logo', (req, res) => {
+  const admin = req.session.admin;
+
+  try {
+    db.prepare("DELETE FROM settings WHERE key = 'custom_logo_base64'").run();
+
+    logAudit(
+      null,
+      admin.name,
+      'SETTINGS_LOGO_RESET',
+      `App-Logo auf Standard zurückgesetzt.`,
+      req.ip
+    );
+
+    res.redirect('/admin#settings');
+  } catch (error) {
+    console.error('Error resetting logo:', error);
+    res.status(500).send('Fehler beim Zurücksetzen des Logos.');
   }
 });
 
