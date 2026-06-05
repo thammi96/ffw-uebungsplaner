@@ -14,7 +14,7 @@ WORKDIR /app
 COPY --chown=node:node package*.json ./
 
 # Install only production dependencies (runs under root for system build tools access, then we chown)
-RUN npm ci --only=production
+RUN npm ci --omit=dev
 
 # Copy application sources with node ownership
 COPY --chown=node:node . .
