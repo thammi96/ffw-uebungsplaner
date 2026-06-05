@@ -146,8 +146,7 @@ app.use('/', publicRouter);
 // Root path: public events overview (PWA start page)
 app.get('/', (req, res) => {
   try {
-    const now = new Date().toISOString();
-    const events = db.prepare(`
+    const allEvents = db.prepare(`
       SELECT e.*,
         (SELECT COUNT(*) FROM signups s WHERE s.event_id = e.id AND s.status = 'ZUSAGE') as yes_count,
         (SELECT COUNT(*) FROM signups s WHERE s.event_id = e.id AND s.status = 'ABSAGE') as no_count
@@ -155,13 +154,16 @@ app.get('/', (req, res) => {
       ORDER BY e.event_date ASC
     `).all();
 
+    const now = new Date();
+    const events = allEvents.filter(e => new Date(e.event_date) >= now);
+
     events.forEach(e => {
       const d = new Date(e.event_date);
       e.formatted_date = d.toLocaleString('de-DE', {
         day: '2-digit', month: '2-digit', year: 'numeric',
         hour: '2-digit', minute: '2-digit'
       });
-      const diffMs = d - new Date();
+      const diffMs = d - now;
       e.days_until = Math.max(0, Math.ceil(diffMs / (1000 * 60 * 60 * 24)));
     });
 

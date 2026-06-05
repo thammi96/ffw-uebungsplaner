@@ -35,8 +35,8 @@ function formatGermanDate(dateStr) {
 router.get('/', (req, res) => {
   const admin = req.session.admin;
   try {
-    // 1. Fetch events with attendance statistics
-    const events = db.prepare(`
+    // 1. Fetch all events with attendance statistics
+    const allEvents = db.prepare(`
       SELECT e.*, 
              (SELECT COUNT(*) FROM signups s WHERE s.event_id = e.id AND s.status = 'ZUSAGE') as yes_count,
              (SELECT COUNT(*) FROM signups s WHERE s.event_id = e.id AND s.status = 'ABSAGE') as no_count
@@ -44,8 +44,12 @@ router.get('/', (req, res) => {
       ORDER BY e.event_date ASC
     `).all();
 
+    const now = new Date();
+    const events = allEvents.filter(e => new Date(e.event_date) >= now);
+    const pastEvents = allEvents.filter(e => new Date(e.event_date) < now).reverse();
+
     // Format dates for template
-    events.forEach(e => {
+    allEvents.forEach(e => {
       e.formatted_date = formatGermanDate(e.event_date);
     });
 
@@ -68,7 +72,7 @@ router.get('/', (req, res) => {
 
     // 5. Fetch details for each event (all signups per event)
     const eventSignups = {};
-    for (const e of events) {
+    for (const e of allEvents) {
       const signups = db.prepare(`
         SELECT s.*, u.name, u.phone_number
         FROM signups s
@@ -87,6 +91,7 @@ router.get('/', (req, res) => {
     res.render('admin', {
       admin,
       events,
+      pastEvents,
       pendingUsers,
       approvedUsers,
       auditLogs,
