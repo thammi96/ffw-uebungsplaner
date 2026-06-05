@@ -80,8 +80,8 @@ Die Aufzeichnung der Testausführung ist hier hinterlegt: ![PWA Flow Test](./ffw
 3. Öffne im Browser `http://localhost:3001/`.
 
 ### Deployment im Docker-Container
-1. Konfiguriere die Produktionsvariablen in der `docker-compose.yml` (Entra ID Client/Secret, VAPID-Schlüssel, Admin Group ID).
-2. Deaktiviere den lokalen Debug-Modus durch Setzen von `LOCAL_DEBUG_ADMIN=false`.
+1. Kopiere `.env.example` in eine neue `.env`-Datei auf dem Server und konfiguriere die Produktionsvariablen (Entra ID Client/Secret, VAPID-Schlüssel, Admin Group ID).
+2. Deaktiviere den lokalen Debug-Modus durch Setzen von `LOCAL_DEBUG_ADMIN=false` in der `.env`-Datei.
 3. Baue und starte den Container:
    ```bash
    docker compose up -d --build

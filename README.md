@@ -59,9 +59,13 @@ Eine progressive Web-App (PWA) zur effizienten Termin- und Übungsplanung für F
 Die App ist für den Einsatz hinter einem Reverse-Proxy (z. B. Sophos Firewall / WAF) konzipiert. Der Proxy übernimmt die SSL-Terminierung (HTTPS), die App selbst läuft intern auf HTTP auf Port 3001.
 
 ### Start per Docker Compose
-1. Öffne die `docker-compose.yml` und trage deine Produktionsparameter ein (Entra ID Anmeldedaten, Admin Group ID, Host-Domain).
-2. Setze `LOCAL_DEBUG_ADMIN=false` in der Compose-Datei, um den unbefugten lokalen Zugriff zu sperren.
-3. Container im Hintergrund bauen und starten:
+1. Kopiere die Datei `.env.example` auf deinem Server in eine neue Datei namens `.env`:
+   ```bash
+   cp .env.example .env
+   ```
+2. Trage deine Produktionsparameter (Entra-Verbindung, VAPID-Schlüssel usw.) in der `.env`-Datei ein.
+3. Setze `LOCAL_DEBUG_ADMIN=false` in der `.env`-Datei, um den unbefugten lokalen Zugriff zu sperren.
+4. Container im Hintergrund bauen und starten:
    ```bash
    docker compose up -d --build
    ```
