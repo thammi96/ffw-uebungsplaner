@@ -91,7 +91,8 @@ router.get('/', (req, res) => {
       approvedUsers,
       auditLogs,
       eventSignups,
-      settings
+      settings,
+      isAdminPage: true
     });
   } catch (error) {
     console.error('Error loading admin dashboard:', error);

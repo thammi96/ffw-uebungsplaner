@@ -40,15 +40,14 @@ app.set('views', path.join(__dirname, 'views'));
 // Dynamic PWA Manifest and Logo Assets Route (persistent via SQLite)
 app.get('/manifest.json', (req, res) => {
   try {
-    const nameRow = db.prepare("SELECT value FROM settings WHERE key = 'app_name'").get();
-    const appName = nameRow ? nameRow.value : 'Feuerwehr Übungsplaner';
     const manifest = {
-      "name": appName,
-      "short_name": appName.substring(0, 12),
+      "name": "FFW Planer",
+      "short_name": "FFW Planer",
       "description": "Termin- und Übungsplanung für Jugendfeuerwehr und aktive Mannschaft",
-      "start_url": "/admin",
+      "start_url": "/",
+      "scope": "/",
       "display": "standalone",
-      "background_color": "#090d16",
+      "background_color": "#f8fafc",
       "theme_color": "#dc2626",
       "orientation": "portrait-primary",
       "icons": [
@@ -144,9 +143,33 @@ app.use('/auth', authRouter);
 app.use('/admin', adminRouter);
 app.use('/', publicRouter);
 
-// Root path redirect to admin dashboard
+// Root path: public events overview (PWA start page)
 app.get('/', (req, res) => {
-  res.redirect('/admin');
+  try {
+    const now = new Date().toISOString();
+    const events = db.prepare(`
+      SELECT e.*,
+        (SELECT COUNT(*) FROM signups s WHERE s.event_id = e.id AND s.status = 'ZUSAGE') as yes_count,
+        (SELECT COUNT(*) FROM signups s WHERE s.event_id = e.id AND s.status = 'ABSAGE') as no_count
+      FROM events e
+      ORDER BY e.event_date ASC
+    `).all();
+
+    events.forEach(e => {
+      const d = new Date(e.event_date);
+      e.formatted_date = d.toLocaleString('de-DE', {
+        day: '2-digit', month: '2-digit', year: 'numeric',
+        hour: '2-digit', minute: '2-digit'
+      });
+      const diffMs = d - new Date();
+      e.days_until = Math.max(0, Math.ceil(diffMs / (1000 * 60 * 60 * 24)));
+    });
+
+    res.render('index', { events });
+  } catch (err) {
+    console.error('Error loading homepage:', err);
+    res.status(500).send('Serverfehler.');
+  }
 });
 
 // 404 handler

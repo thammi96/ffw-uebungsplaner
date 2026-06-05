@@ -88,19 +88,6 @@
 </style>
 
 <div class="space-y-6">
-  <!-- Top Bar with Admin Name -->
-  <div class="glass-panel rounded-2xl p-6 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 glow-red">
-    <div>
-      <h2 class="text-xl md:text-2xl font-extrabold text-slate-900 dark:text-white tracking-tight">Übersicht Übungen</h2>
-      <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">Eingeloggt als: <span class="text-slate-700 dark:text-slate-200 font-semibold"><%= admin.name %></span> (<%= admin.email %>)</p>
-    </div>
-    
-    <!-- Action Button -->
-    <button onclick="toggleCreateEventForm()" class="px-4 py-2.5 bg-brand-600 hover:bg-brand-500 text-white font-semibold rounded-xl text-sm transition-all shadow-lg shadow-brand-600/15">
-      + Neue Übung anlegen
-    </button>
-  </div>
-
 
   <!-- TAB CONTENT 1: Events -->
   <div id="tab-content-events" class="space-y-6">
@@ -635,12 +622,15 @@
   // Initial check
   handleHashChange();
 
-  // Toggle event creation form
+  // Toggle event creation form — also resets date picker state so default time applies fresh
   function toggleCreateEventForm() {
     const container = document.getElementById('create-event-container');
     container.classList.toggle('hidden');
     if (!container.classList.contains('hidden')) {
       container.scrollIntoView({ behavior: 'smooth' });
+      // Reset date picker state so the group default time is applied on next date click
+      dateHasBeenSelected = false;
+      isApplyingDefault = false;
     }
   }
 
@@ -661,6 +651,8 @@
 
   // Flag to prevent infinite loop when we re-select with default time
   let isApplyingDefault = false;
+  // Track if the user already picked a date this session (reset by toggleCreateEventForm)
+  let dateHasBeenSelected = false;
 
   // Initialize Air Datepicker — stays open after date selection so user can pick time too
   const airDpInstance = new AirDatepicker('#event_date_picker', {
@@ -690,11 +682,13 @@
     onSelect({ date }) {
       if (!date) {
         document.getElementById('event_date_hidden').value = '';
+        dateHasBeenSelected = false;
         return;
       }
 
-      // If this is a fresh date click (time = midnight), auto-apply the group default time
-      if (!isApplyingDefault && date.getHours() === 0 && date.getMinutes() === 0) {
+      // First date click: auto-apply the group's configured default time
+      if (!isApplyingDefault && !dateHasBeenSelected) {
+        dateHasBeenSelected = true;
         const group = document.querySelector('select[name="target_group"]').value;
         const timeStr = defaultTimes[group] || '19:00';
         const [dh, dm] = timeStr.split(':').map(Number);
@@ -702,7 +696,6 @@
         newDate.setHours(dh, dm, 0, 0);
         isApplyingDefault = true;
         airDpInstance.selectDate(newDate);
-        // writeIsoValue is called in the next invocation
         return;
       }
 
