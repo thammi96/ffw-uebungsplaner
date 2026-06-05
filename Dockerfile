@@ -24,12 +24,12 @@ COPY . .
 RUN mkdir -p /app/data
 
 # Environment configuration defaults
-ENV PORT=3000
+ENV PORT=3001
 ENV NODE_ENV=production
 ENV DB_PATH=/app/data/database.sqlite
 
 # Open listening port
-EXPOSE 3000
+EXPOSE 3001
 
 # Start app
 CMD ["node", "src/server.js"]

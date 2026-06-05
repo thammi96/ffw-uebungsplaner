@@ -11,7 +11,7 @@ dotenv.config();
 const { db, logAudit } = require('./db');
 
 const app = express();
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 3001;
 
 // Trust reverse proxy (Sophos WAF)
 app.set('trust proxy', 1);

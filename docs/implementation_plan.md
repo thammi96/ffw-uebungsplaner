@@ -95,7 +95,7 @@ We will create a new Node.js workspace in `C:\Users\Marco\.gemini\antigravity-id
 - Node production container using `node:18-alpine` (building dependencies like `better-sqlite3` requires some build tools, or we can use a debian-slim image to avoid compilation issues with node-gyp on alpine). Let's use `node:18-bullseye-slim` for smooth `better-sqlite3` installation.
 
 #### [NEW] [docker-compose.yml](file:///C:/Users/Marco/.gemini/antigravity-ide/scratch/ffw-uebungsplaner/docker-compose.yml)
-- Sets up node container mapping `/app/data` to a Docker volume `ffw-data` (storing the SQLite DB), exposes port 3000, and specifies environment variables.
+- Sets up node container mapping `/app/data` to a Docker volume `ffw-data` (storing the SQLite DB), exposes port 3001, and specifies environment variables.
 
 ---
 

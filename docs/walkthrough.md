@@ -77,7 +77,7 @@ Die Aufzeichnung der Testausführung ist hier hinterlegt: ![PWA Flow Test](./ffw
    ```powershell
    npm run dev
    ```
-3. Öffne im Browser `http://localhost:3000/`.
+3. Öffne im Browser `http://localhost:3001/`.
 
 ### Deployment im Docker-Container
 1. Konfiguriere die Produktionsvariablen in der `docker-compose.yml` (Entra ID Client/Secret, VAPID-Schlüssel, Admin Group ID).

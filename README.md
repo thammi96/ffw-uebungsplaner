@@ -49,14 +49,14 @@ Eine progressive Web-App (PWA) zur effizienten Termin- und Übungsplanung für F
    npm run dev
    ```
 5. App im Browser öffnen:
-   - Dashboard / Admin: `http://localhost:3000/admin` (über den Debug-Bypass anmelden)
-   - Öffentlicher Übungslink: `http://localhost:3000/event/1` (sobald eine Übung angelegt ist)
+   - Dashboard / Admin: `http://localhost:3001/admin` (über den Debug-Bypass anmelden)
+   - Öffentlicher Übungslink: `http://localhost:3001/event/1` (sobald eine Übung angelegt ist)
 
 ---
 
 ## Deployment im Docker-Container
 
-Die App ist für den Einsatz hinter einem Reverse-Proxy (z. B. Sophos Firewall / WAF) konzipiert. Der Proxy übernimmt die SSL-Terminierung (HTTPS), die App selbst läuft intern auf HTTP.
+Die App ist für den Einsatz hinter einem Reverse-Proxy (z. B. Sophos Firewall / WAF) konzipiert. Der Proxy übernimmt die SSL-Terminierung (HTTPS), die App selbst läuft intern auf HTTP auf Port 3001.
 
 ### Start per Docker Compose
 1. Öffne die `docker-compose.yml` und trage deine Produktionsparameter ein (Entra ID Anmeldedaten, Admin Group ID, Host-Domain).
@@ -67,6 +67,44 @@ Die App ist für den Einsatz hinter einem Reverse-Proxy (z. B. Sophos Firewall /
    ```
 
 Die SQLite-Datenbankdatei wird im benannten Docker-Volume `ffw-data` auf dem Ubuntu-Host persistent gespeichert.
+
+---
+
+## Microsoft Entra ID (Azure AD) Konfiguration
+
+Um das Admin-Dashboard mit Microsoft 365 Entra ID abzusichern, folge dieser Konfigurationsanleitung:
+
+1. **Microsoft Entra Admin Center öffnen**:
+   Melde dich im [Entra Admin Center](https://entra.microsoft.com/) an und navigiere zu **Identität** > **Anwendungen** > **App-Registrierungen**.
+   
+2. **App-Registrierung anlegen**:
+   - Klicke auf **Neue Registrierung**.
+   - **Name**: `ffw-uebungsplaner`
+   - **Unterstützte Kontotypen**: *Nur Konten in diesem Organisationsverzeichnis (Einzelner Mandant)*.
+   - **Umleitungs-URI (Redirect URI)**: Plattform **Web** auswählen.
+     - Für lokales Testen: `http://localhost:3001/auth/callback`
+     - Für die Server-Bereitstellung: `https://deine-domain.de/auth/callback` *(Muss HTTPS sein!)*
+   - Klicke auf **Registrieren**.
+
+3. **IDs sichern**:
+   - Kopiere die **Anwendungs-ID (Client-ID)** und trage sie in `.env` oder `docker-compose.yml` als `ENTRA_CLIENT_ID` ein.
+   - Kopiere die **Verzeichnis-ID (Mandanten-ID / Tenant-ID)** und trage sie als `ENTRA_TENANT_ID` ein.
+
+4. **Client-Geheimnis (Client Secret) generieren**:
+   - Navigiere zu **Zertifikate & Geheimnisse** > **Neues Clientgeheimnis**.
+   - Trage eine Beschreibung ein und wähle die Gültigkeitsdauer.
+   - Klicke auf **Hinzufügen** und kopiere **sofort** den **Wert (Value)** (nicht die Geheimnis-ID!). Trage diesen Wert als `ENTRA_CLIENT_SECRET` ein.
+
+5. **API-Berechtigungen hinzufügen**:
+   - Navigiere zu **API-Berechtigungen** > **Berechtigung hinzufügen**.
+   - Wähle **Microsoft Graph** > **Delegierte Berechtigungen**.
+   - Stelle sicher, dass `User.Read` aktiv ist.
+   - Suche nach `Directory.Read.All` oder `GroupMember.Read.All` und füge die Berechtigung hinzu (erforderlich, um Gruppenmitgliedschaften des angemeldeten Admins zu prüfen).
+   - Klicke auf **Administratoreinwilligung für [Tenant-Name] erteilen** und bestätige dies.
+
+6. **Admin-Gruppe einrichten**:
+   - Navigiere im Entra Center zu **Gruppen** > **Alle Gruppen** und wähle die Sicherheitsgruppe aus (z. B. `Feuerwehr-Admins`), die Zugriff auf das Admin-Dashboard erhalten soll.
+   - Kopiere die **Objekt-ID** der Gruppe und trage sie als `ENTRA_ADMIN_GROUP_ID` ein.
 
 ---
 
