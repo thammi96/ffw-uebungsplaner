@@ -118,11 +118,18 @@ app.use((req, res, next) => {
   try {
     const nameRow = db.prepare("SELECT value FROM settings WHERE key = 'app_name'").get();
     const subRow = db.prepare("SELECT value FROM settings WHERE key = 'app_subtitle'").get();
+    const zusageRow = db.prepare("SELECT value FROM settings WHERE key = 'suggestions_zusage'").get();
+    const absageRow = db.prepare("SELECT value FROM settings WHERE key = 'suggestions_absage'").get();
+    
     res.locals.appName = nameRow ? nameRow.value : 'Feuerwehr Übungsplaner';
     res.locals.appSubtitle = subRow ? subRow.value : 'Freiwillige Feuerwehr';
+    res.locals.suggestionsZusage = zusageRow ? zusageRow.value : '';
+    res.locals.suggestionsAbsage = absageRow ? absageRow.value : '';
   } catch (err) {
     res.locals.appName = 'Feuerwehr Übungsplaner';
     res.locals.appSubtitle = 'Freiwillige Feuerwehr';
+    res.locals.suggestionsZusage = '';
+    res.locals.suggestionsAbsage = '';
   }
   next();
 });

@@ -85,6 +85,8 @@ db.exec(`
   INSERT OR IGNORE INTO settings (key, value) VALUES ('app_subtitle', 'Freiwillige Feuerwehr');
   INSERT OR IGNORE INTO settings (key, value) VALUES ('push_title_template', 'Terminerinnerung: {title}');
   INSERT OR IGNORE INTO settings (key, value) VALUES ('push_body_template', 'Nächste Übung am {date}. Bitte gib Rückmeldung.');
+  INSERT OR IGNORE INTO settings (key, value) VALUES ('suggestions_zusage', 'Bringe Kasten Bier mit, Bringe Cola mit, Fahre als Fahrer, Bringe Grillkohle mit, Direkt vom Dienst');
+  INSERT OR IGNORE INTO settings (key, value) VALUES ('suggestions_absage', 'Privater Geburtstag, Spätschicht / Arbeit, Krankheit, Urlaub, Schule / Klausur');
 `);
 
 const webpush = require('web-push');
