@@ -28,6 +28,56 @@ router.get('/event/:id', (req, res) => {
   }
 });
 
+// GET /event/:id/ics (Server-side ICS for mobile/desktop native calendar integration)
+router.get('/event/:id/ics', (req, res) => {
+  const eventId = req.params.id;
+  try {
+    const event = db.prepare('SELECT * FROM events WHERE id = ?').get(eventId);
+    if (!event) {
+      return res.status(404).send('Übung nicht gefunden.');
+    }
+
+    const date = new Date(event.event_date);
+    const endDate = new Date(date.getTime() + 2 * 60 * 60 * 1000); // 2 hours duration
+
+    function formatICSDate(d) {
+      return d.toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z';
+    }
+
+    const startFormatted = formatICSDate(date);
+    const endFormatted = formatICSDate(endDate);
+
+    const icsLines = [
+      'BEGIN:VCALENDAR',
+      'VERSION:2.0',
+      'PRODID:-//FFW Uebungsplaner//Calendar Event//DE',
+      'CALSCALE:GREGORIAN',
+      'METHOD:PUBLISH',
+      'BEGIN:VEVENT',
+      `UID:${event.id}-${Date.now()}@ffw-uebungsplaner.local`,
+      `DTSTAMP:${formatICSDate(new Date())}`,
+      `DTSTART:${startFormatted}`,
+      `DTEND:${endFormatted}`,
+      `SUMMARY:${event.title.replace(/[,;]/g, '\\$&')}`,
+      `DESCRIPTION:${(event.description || '').replace(/[\r\n]+/g, '\\n').replace(/[,;]/g, '\\$&')}`,
+      'LOCATION:Feuerwehrgerätehaus',
+      'STATUS:CONFIRMED',
+      'SEQUENCE:0',
+      'END:VEVENT',
+      'END:VCALENDAR'
+    ];
+
+    const icsContent = icsLines.join('\r\n');
+
+    res.setHeader('Content-Type', 'text/calendar; charset=utf-8');
+    res.setHeader('Content-Disposition', `attachment; filename="event_${event.id}.ics"`);
+    res.send(icsContent);
+  } catch (error) {
+    console.error('Error generating ICS:', error);
+    res.status(500).send('Serverfehler bei der Generierung der Kalenderdatei.');
+  }
+});
+
 // POST /event/:id/check-phone
 router.post('/event/:id/check-phone', (req, res) => {
   const eventId = req.params.id;
